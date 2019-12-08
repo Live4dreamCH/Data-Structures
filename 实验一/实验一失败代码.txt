@@ -1,0 +1,174 @@
+/*
+6 10
+
+1 8 4 3 5 2
+*/
+#include "pch.h"
+#include <iostream>
+using namespace std;
+
+template<class T>
+class stack	//由于此问题中，栈的最大长度即为物件数，故使用顺序栈
+{
+	int MaxSize;
+	T* base;
+	int top;
+public:
+	stack(int size=0)
+	{
+		if (size < 0)
+		{
+			cerr << "长度不能为负！";
+		}
+		else
+		{
+			MaxSize = size;
+			base = new T[MaxSize];
+			if (base == NULL)
+			{
+				cerr << "创建失败！";
+			}
+			else
+			{
+				top = 0;
+				cout << "创建栈成功，长度为" << MaxSize << endl;
+			}
+		}
+	}
+	~stack()	//摧毁栈
+	{
+		delete[]base;
+	}
+	bool IsEmpty()const
+	{
+		if (top == 0)
+			return true;
+		return false;
+	}
+	bool IsFull()const
+	{
+		if (top == MaxSize)
+			return true;
+		return false;
+	}
+	void clear()	//清空元素
+	{
+		top = 0;
+	}
+	int len()const	//求长度
+	{
+		return top;
+	}
+	void push(T &e)
+	{
+		if (IsFull())
+			cout << "栈已满，无法插入！" << endl;
+		else
+			base[top++] = e;
+	}
+	T pop()			//返回并删除栈顶元素
+	{
+		if (IsEmpty())
+			cout << "栈为空，无法弹出！" << endl;
+		else
+			return base[--top];
+	}
+	T GetTop()	//仅返回栈顶元素，但不删除
+	{
+		if (IsEmpty())
+			cout << "栈为空，无法获取！" << endl;
+		else
+			return base[top - 1];
+	}
+	T add()			//对栈进行魔改233
+	{
+		T sum=0;
+		for (int i = 0; i < top; i++)
+		{
+			sum += base[i];
+		}
+		return sum;
+	}
+	void print()	//测试用
+	{
+		for (int i = 0; i < top; i++)
+		{
+			cout << base[i] << ends;
+		}
+		cout << endl;
+	}
+};
+
+int main()
+{
+	int n, *t, *p, i, k = 0, v;		//n数量，t物品，p位置
+	cout << "请输入物品件数n和总体积V：（用空格或回车分割）" << endl;
+	cin >> n >> v;
+	t = new int[n];
+	p = new int[n];
+	stack<int> pack(n);
+
+	cout << "请输入各物体体积：（用空格或回车分割）" << endl;
+	for (i = 0; i < n; i++)
+	{
+		cin >> t[i];
+		p[i] = -1;
+	}
+	//输入完成
+
+	while (p[0] < n)	//n?n-1?
+	{
+		for (i = ((k==0)?0: p[k - 1]); i < n; i++)
+		{
+			pack.push(t[i]);
+			p[k++] = i;	//有问题
+
+			pack.print();		//测试用
+			for (int z = 0; z < k; z++)
+			{
+				cout << t[p[z]] << ends;
+			}
+			cout << endl;
+
+			if (pack.add() == v)
+			{
+				cout << '{' << t[p[0]];
+				for (int j = 1; j < k; j++)
+				{
+					cout << ',' << t[p[j]];
+				}
+				cout << '}' << endl;
+
+				if (pack.pop() < v)
+				{
+					pack.pop();
+					p[--k] = -1;
+				}
+				p[k - 1]++;	
+				i = p[k - 1];
+			}
+			if (pack.add() > v)
+			{
+				pack.pop();
+				p[--k] = -1;
+			}
+			//pack.print();		//测试用
+		}
+		pack.pop();
+		//pack.print();		//测试用
+		p[k - 1]++;
+	}
+	cout << "求解完毕！";
+	return 0;
+}
+
+// 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单
+// 调试程序: F5 或调试 >“开始调试”菜单
+
+// 入门提示: 
+//   1. 使用解决方案资源管理器窗口添加/管理文件
+//   2. 使用团队资源管理器窗口连接到源代码管理
+//   3. 使用输出窗口查看生成输出和其他消息
+//   4. 使用错误列表窗口查看错误
+//   5. 转到“项目”>“添加新项”以创建新的代码文件，或转到“项目”>“添加现有项”以将现有代码文件添加到项目
+//   6. 将来，若要再次打开此项目，请转到“文件”>“打开”>“项目”并选择 .sln 文件
